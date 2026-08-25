@@ -215,12 +215,12 @@ class CarlineCrawler {
         }
         $metaFile = $this->dataDir . 'meta.json';
         $meta = file_exists($metaFile) ? json_decode(file_get_contents($metaFile), true) : [];
-        $date = $meta['data_date'] ?? date('Y-m-d');
+        $datetime = date('Y-m-d H:i:s');
         chdir($this->dataDir);
         exec('git add -A');
         exec('git diff --cached --quiet', $output, $exitCode);
         if ($exitCode !== 0) {
-            exec('git commit -m "Update routes ' . $date . '"');
+            exec('git commit -m "Update routes ' . $datetime . '"');
             echo "Data repo committed.\n";
         } else {
             echo "Data repo: no changes to commit.\n";
