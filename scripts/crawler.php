@@ -142,6 +142,9 @@ class TNEPBCrawler {
 if (php_sapi_name() === 'cli' || !isset($_SERVER['HTTP_HOST'])) {
     $crawler = new TNEPBCrawler();
     $success = $crawler->run();
+    if ($success) {
+        require_once __DIR__ . '/build_data.php';
+    }
     exit($success ? 0 : 1);
 }
 ?>

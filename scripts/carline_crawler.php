@@ -269,7 +269,7 @@ class CarlineCrawler {
 // Handle command line arguments
 if (php_sapi_name() === 'cli' || !isset($_SERVER['HTTP_HOST'])) {
     $crawler = new CarlineCrawler();
-    
+
     // Check for command line arguments
     if ($argc > 1) {
         $carLicence = $argv[1];
@@ -279,7 +279,10 @@ if (php_sapi_name() === 'cli' || !isset($_SERVER['HTTP_HOST'])) {
     } else {
         $success = $crawler->runAll();
     }
-    
+
+    if ($success) {
+        require_once __DIR__ . '/build_data.php';
+    }
     exit($success ? 0 : 1);
 }
 ?>

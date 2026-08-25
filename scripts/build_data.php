@@ -8,6 +8,8 @@
  *   data/routes/{linename}.json - route stop data per line (from carline)
  *   data/routes.json            - index of all routes with metadata
  *   data/meta.json              - build metadata (timestamp, counts)
+ *
+ * Called automatically by crawler.php and carline_crawler.php after successful crawl.
  */
 
 $rawDir = dirname(__DIR__) . '/raw/';
@@ -23,7 +25,7 @@ if (!is_dir($dataDir . 'routes/')) {
 $carsFile = $rawDir . 'NewgetCarsinfo.json';
 if (!file_exists($carsFile)) {
     echo "Error: $carsFile not found. Run crawler.php first.\n";
-    exit(1);
+    return;
 }
 
 // Build vehicles.json
@@ -185,3 +187,18 @@ file_put_contents(
 );
 echo "meta.json: built at " . $meta['built_at'] . "\n";
 echo "\nDone. Data repository built in data/\n";
+
+// Commit changes to the data repo
+$gitDir = $dataDir . '.git';
+if (is_dir($gitDir)) {
+    $date = $meta['data_date'] ?? date('Y-m-d');
+    chdir($dataDir);
+    exec('git add -A');
+    exec('git diff --cached --quiet', $output, $exitCode);
+    if ($exitCode !== 0) {
+        exec('git commit -m "Update data ' . $date . '"');
+        echo "Data repo committed.\n";
+    } else {
+        echo "Data repo: no changes to commit.\n";
+    }
+}
