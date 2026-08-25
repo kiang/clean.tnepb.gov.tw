@@ -197,6 +197,32 @@ class CarlineCrawler {
         );
         echo "routes.json: " . count($routeIndex) . " routes indexed\n";
 
+        $carRoutes = [];
+        foreach (glob($this->routesDir . '*.json') as $file) {
+            $routeData = json_decode(file_get_contents($file), true);
+            if (!$routeData || !isset($routeData['stops'])) {
+                continue;
+            }
+            $linename = $routeData['linename'];
+            foreach ($routeData['stops'] as $stop) {
+                if (!empty($stop['car_licence'])) {
+                    $licence = $stop['car_licence'];
+                    if (!isset($carRoutes[$licence])) {
+                        $carRoutes[$licence] = [];
+                    }
+                    if (!in_array($linename, $carRoutes[$licence])) {
+                        $carRoutes[$licence][] = $linename;
+                    }
+                }
+            }
+        }
+        ksort($carRoutes);
+        file_put_contents(
+            $this->dataDir . 'car_routes.json',
+            json_encode($carRoutes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES)
+        );
+        echo "car_routes.json: " . count($carRoutes) . " vehicles indexed\n";
+
         // Update meta
         $metaFile = $this->dataDir . 'meta.json';
         $meta = file_exists($metaFile) ? json_decode(file_get_contents($metaFile), true) : [];
