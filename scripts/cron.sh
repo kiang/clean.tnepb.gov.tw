@@ -12,9 +12,15 @@ git pull --quiet
 # Run vehicle crawler (every execution = every 5 minutes via crontab)
 /usr/bin/php "$BASEDIR/scripts/crawler.php"
 
-# Run carline crawler on Tuesday (day 2)
+# Run carline crawler once on Tuesday (day 2)
+CARLINE_LOCK="$BASEDIR/data/.carline_done"
 if [ "$DAY_OF_WEEK" -eq 2 ]; then
-    /usr/bin/php "$BASEDIR/scripts/carline_crawler.php"
+    if [ ! -f "$CARLINE_LOCK" ]; then
+        /usr/bin/php "$BASEDIR/scripts/carline_crawler.php"
+        date +%F > "$CARLINE_LOCK"
+    fi
+else
+    rm -f "$CARLINE_LOCK"
 fi
 
 # Push data repo if it has a remote
